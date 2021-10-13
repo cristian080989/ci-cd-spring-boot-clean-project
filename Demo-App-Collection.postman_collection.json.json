@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "823cf0f1-1a63-4d86-b141-9f9a030b5c32",
+		"name": "Demo App Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Calculate price for valid source and destination",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validate response content for source street\", function () {\r",
+							"    pm.expect(jsonData.source.street).to.contain(\"Virchowstraße\");\r",
+							"});\r",
+							"    \r",
+							"pm.test(\"Validate response content for destination street\", function() {\r",
+							"    pm.expect(jsonData.destination.street).to.contain(\"Goethestraße\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response content for distance in Kilometer to be above 1\", function() {\r",
+							"    pm.expect(jsonData.driving.distanceInKilometer).to.be.above(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response content for duration to be above 5 minuntes\", function() {\r",
+							"    pm.expect(jsonData.driving.durationInMinutes).to.be.above(5);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response content for price to be 27 Euro\", function() {\r",
+							"    var price = Math.trunc(jsonData.price);\r",
+							"    pm.expect(price).to.be.equal(27);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"source\": {\r\n\t\t\"street\": \"Virchowstraße 167a\",\r\n\t\t\"zipCode\": \"45147\",\r\n\t\t\"city\": \"Essen\",\r\n\t\t\"country\": \"de\"\r\n\t},\r\n\t\"destination\": {\r\n\t\t\"street\": \"Goethestraße 41\",\r\n\t\t\"zipCode\": \"45128\",\r\n\t\t\"city\": \"Essen\",\r\n\t\t\"country\": \"de\"\r\n\t}\r\n}"
+				},
+				"url": {
+					"raw": "https://932233252044.dkr.ecr.sa-east-1.amazonaws.com/intercorp_retail_test/api/pricing",
+					"protocol": "https",
+					"host": [
+						"932233252044",
+						"dkr",
+						"ecr",
+						"sa-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"intercorp_retail_test",
+						"api",
+						"pricing"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fail to calculate price because locations not exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Request is failed with status code 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate response content to contain failure message\", function () {\r",
+							"    pm.expect(jsonData.message).to.equals(\"No pricing available for the specified source and destination!\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"source\": {\r\n\t\t\"street\": \"Entenhausenstraße 100000\",\r\n\t\t\"zipCode\": \"45147\",\r\n\t\t\"city\": \"Essen\",\r\n\t\t\"country\": \"de\"\r\n\t},\r\n\t\"destination\": {\r\n\t\t\"street\": \"Tor zur Hölle\",\r\n\t\t\"zipCode\": \"45128\",\r\n\t\t\"city\": \"Essen\",\r\n\t\t\"country\": \"de\"\r\n\t}\r\n}"
+				},
+				"url": {
+					"raw": "https://932233252044.dkr.ecr.sa-east-1.amazonaws.com/intercorp_retail_test/api/pricing",
+					"protocol": "https",
+					"host": [
+						"932233252044",
+						"dkr",
+						"ecr",
+						"sa-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"intercorp_retail_test",
+						"api",
+						"pricing"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
